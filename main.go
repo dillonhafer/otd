@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"golang.org/x/net/html"
 	"io"
+	"math/rand"
 	"net/http"
 	"os"
 	"strings"
@@ -61,23 +62,20 @@ func eventsHtml() io.ReadCloser {
 	return readCache()
 }
 
-func main() {
-	//	 .xpath('//ul')[1]
-	//	 .elements
-	//	 .collect {|node| node.text.strip}
+func events() []string {
+	var events []string
+	var text []byte
 	body := eventsHtml()
 	z := html.NewTokenizer(body)
-	// doc, _ := html.Parse(body)
 	defer body.Close()
 	ulCount := 0
 
 	for {
 		tt := z.Next()
-
 		switch {
 		case tt == html.ErrorToken:
 			// End of the document, we're done
-			return
+			return events
 		case tt == html.StartTagToken:
 			t := z.Token()
 			if t.Data == "ul" {
@@ -85,28 +83,40 @@ func main() {
 			}
 
 			if t.Data == "li" && ulCount == 2 {
-				var text []byte
 				for {
 					u := z.Next()
 					ntext := z.Text()
 					if u == html.TextToken {
-						text = append(text[:], ntext[:]...)
+						text = append(text, ntext...)
 					}
 
 					tk := z.Token()
 					if tk.Data == "ul" && u == html.EndTagToken {
-						result := string(text[:])
+						result := string(text)
 						temp := strings.Split(result, "\n")
 
-						for _, element := range temp {
-							// element is the element from someSlice for where we are
-							println("On this day in", element)
+						for _, eventText := range temp {
+							event := fmt.Sprintf("On this day in %s", eventText)
+							events = append(events, event)
 						}
-						println("Total events:", len(temp))
-						return
+						return events
 					}
 				}
 			}
 		}
 	}
+	return events
+}
+
+func randomEvent(events []string) string {
+	totalEvents := len(events) - 2
+	rand.Seed(time.Now().UnixNano())
+	r := rand.Intn(totalEvents)
+	return events[r]
+}
+
+func main() {
+	events := events()
+	event := randomEvent(events)
+	println(event)
 }
