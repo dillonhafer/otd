@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"golang.org/x/net/html"
 	"io"
@@ -117,6 +118,22 @@ func randomEvent(events []string) string {
 
 func main() {
 	events := events()
-	event := randomEvent(events)
-	println(event)
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		var jsonResp struct {
+			Text string `json:"text"`
+		}
+		randomEvent := randomEvent(events)
+		jsonResp.Text = randomEvent
+		js, err := json.Marshal(jsonResp)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+		}
+		w.Write(js)
+	})
+
+	err := http.ListenAndServe("127.0.0.1:23000", nil)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
 }
