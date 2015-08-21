@@ -5,6 +5,8 @@ Display a random event that happended on this day in history
 
 ## Usage
 
+You can use `otd` as a CLI Application or as a library in your own `go-lang` project.
+
 A. Import library
 
 ```go
