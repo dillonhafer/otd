@@ -63,7 +63,7 @@ func eventsHtml() io.ReadCloser {
 	return readCache()
 }
 
-func events() []string {
+func Events() []string {
 	var events []string
 	var text []byte
 	body := eventsHtml()
@@ -109,7 +109,7 @@ func events() []string {
 	return events
 }
 
-func randomEvent(events []string) string {
+func RandomEvent(events []string) string {
 	totalEvents := len(events) - 2
 	rand.Seed(time.Now().UnixNano())
 	r := rand.Intn(totalEvents)
@@ -117,12 +117,12 @@ func randomEvent(events []string) string {
 }
 
 func main() {
-	events := events()
+	events := Events()
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		var jsonResp struct {
 			Text string `json:"text"`
 		}
-		randomEvent := randomEvent(events)
+		randomEvent := RandomEvent(events)
 		jsonResp.Text = randomEvent
 		js, err := json.Marshal(jsonResp)
 		if err != nil {
