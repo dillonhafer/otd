@@ -30,6 +30,13 @@ events := otd.Events()
 event  := otd.RandomEvent(events)
 ```
 
+## CLI App
+
+```
+go get github.com/dillonhafer/otd
+otd
+```
+
 ## Example App
 
 I wrote a [slack bot](https://github.com/dillonhafer/historybot) that uses this library.
