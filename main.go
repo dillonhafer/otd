@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -66,9 +67,9 @@ func main() {
 	//	 .collect {|node| node.text.strip}
 	body := eventsHtml()
 	z := html.NewTokenizer(body)
+	// doc, _ := html.Parse(body)
 	defer body.Close()
 	ulCount := 0
-	liCount := 0
 
 	for {
 		tt := z.Next()
@@ -84,25 +85,27 @@ func main() {
 			}
 
 			if t.Data == "li" && ulCount == 2 {
-
+				var text []byte
 				for {
-					dd := z.Next()
-					dd = z.Next()
+					u := z.Next()
+					ntext := z.Text()
+					if u == html.TextToken {
+						text = append(text[:], ntext[:]...)
+					}
 
-					switch {
-					case dd == html.ErrorToken:
+					tk := z.Token()
+					if tk.Data == "ul" && u == html.EndTagToken {
+						result := string(text[:])
+						temp := strings.Split(result, "\n")
+
+						for _, element := range temp {
+							// element is the element from someSlice for where we are
+							println("On this day in", element)
+						}
+						println("Total events:", len(temp))
 						return
-					case dd == html.TextToken:
-						println(string(z.Text()[:]))
 					}
 				}
-				liCount++
-
-				// z.Next()
-				// ntext := z.Text()
-				// text = append(text[:], ntext[:]...)
-
-				// fmt.Println(string(text[:]))
 			}
 		}
 	}
