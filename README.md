@@ -27,3 +27,7 @@ otd.Events()
 events := otd.Events()
 event  := otd.RandomEvent(events)
 ```
+
+## Example App
+
+I wrote a [slack bot](https://github.com/dillonhafer/historybot) that uses this library.
